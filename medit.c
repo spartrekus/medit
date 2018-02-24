@@ -21,7 +21,7 @@
 #define MYOS 0
 #endif
 
-float editor_version = 0.2;
+float editor_version = 0.21;
 
 #include <ncurses.h>
 #include <signal.h>
@@ -521,6 +521,7 @@ void color_c7() //include color
 
 void clearscreen(void)
 {
+    attroff( A_BOLD ); attroff( A_REVERSE );
     if ( color_scheme == 1 )
     {
       color_c5();
@@ -558,6 +559,7 @@ void showstatus(void)
 
 
 
+////////////////////////
 void show(void)
 {
 	int	i, m, t, j;
@@ -618,6 +620,9 @@ void show(void)
                         /// green 
                         if ( color_scheme == 2 ) if ( text[m]  == '{' ) fontcolor1 = 3;
                         if ( color_scheme == 2 ) if ( text[m]  == '}' ) fontcolor1 = 3;
+                        if ( color_scheme == 2 ) 
+                           if ( text[m]  == '/' ) 
+                             if ( text[m+1]  == '/' ) fontcolor1 = 4;
 
                         /// basic yellow commands int, while, for, printf
                         if ( color_scheme == 1 )
@@ -684,10 +689,12 @@ void show(void)
                                 }
                                 else if ( color_scheme == 2 )  
                                 {
+                                   attroff( A_BOLD ); attroff( A_REVERSE );
                                    color_c1(); attroff( A_BOLD );
                                    if ( fontcolor1 == 1 )      {  color_set( 5, NULL );  attron(A_BOLD ); }
                                    else if ( fontcolor1 == 2 ) { color_set( 3, NULL );   attron(A_BOLD ); }   
                                    else if ( fontcolor1 == 3 ) { color_set( 2, NULL );   attron(A_BOLD );  fontcolor1 = 0; }   
+                                   else if ( fontcolor1 == 4 ) { color_set( 4, NULL );   attron(A_BOLD ); }   
                                 }
                                 /////]]
 				adduch( text[m] );
