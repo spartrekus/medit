@@ -35,6 +35,8 @@ int rows, cols;
 int rowmax; 
 int toxin=0;
 int color_scheme=2;
+int currentchar = 0;
+int posy , posx ; 
 
 #define SHIFTY 2
 #define SHIFTX 1
@@ -419,7 +421,7 @@ int	error (char *s, ...)
 	return 0;	/* convinient */
 }
 
-int	bol (int pos)
+int	bol(int pos)
 {
 	while (pos && text[pos - 1] != '\n')
 		pos--;
@@ -537,12 +539,18 @@ void clearscreen(void)
 }
 
 
+void showchar(void)
+{
+    mvprintw( 0, cols-4,"%d", currentchar ); 
+}
+
+
 
 void showstatus(void)
 {
     int foxy;
     color_c2(); 
-    gfxhline( 0,      0, cols-1 , ' ' );
+    gfxhline( 0, 0, cols-1 , ' ' );
     mvprintw( 0, 0, "|MEDIT v%0.1f|by Spartrekus (GNU)|  [FILE:%s]", editor_version , file_name );
 
     color_c2(); 
@@ -556,6 +564,10 @@ void showstatus(void)
     color_c1(); printw( " F9" );  color_c2();  printw( "Menu " );
     color_c1(); printw( " F10" ); color_c2(); printw( "Quit! " );
 }
+
+
+
+
 
 
 
@@ -596,13 +608,16 @@ void show(void)
 		move(i+SHIFTY, 0+SHIFTX );
 #define EOS_COLS (i < rowmax - 1 ? COLS : COLS - 1)
 
-		for (j = 0; m < eof_pos && j < EOS_COLS; m++) {
+		for (j = 0; m < eof_pos && j < EOS_COLS; m++) 
+                {
 
 			if (m >= bos_pos && m < eos_pos)
+                        {
 				attron (A_REVERSE);
+                        }
 			else
 				attroff (A_REVERSE);
-
+ 
                         /// basic  colors for '#' and '!' at begin of new line
                         if ( text[m] == '\n')
                            newline = 1; 
@@ -669,7 +684,7 @@ void show(void)
                             fontcolor1 = 2;
 
                         if ( color_scheme == 1 )  
-                        if ( text[m]   == ' ' ) fontcolor1 = 0;  // set to default color if space
+                        if ( text[m]  == ' ' ) fontcolor1 = 0;  // set to default color if space
 
                         // regular main core of programm
 			if (text[m] == '\n')
@@ -989,10 +1004,15 @@ void init (void)
 	//noecho();
 }
 
+
+
+
+
 void norm_cur(void)
 {
 	int i;
-	cur_line = bol (cur_pos);
+	cur_line = bol(cur_pos);
+        currentchar = text[ cur_pos ];
 	while (cur_line < bow_line)
 		bow_line = prevline (bow_line);
 	cur_y = 0;
@@ -1101,6 +1121,7 @@ int main (int argv, char **argc)
 
                 ///////// level 5
                 showstatus();
+                showchar();
 
 		move(cur_y -SHIFTY+4 , cur_x +SHIFTX);
 		refresh ();
@@ -1117,11 +1138,11 @@ int main (int argv, char **argc)
 			break;
 
 		case KEY_UP:
-			k_up ();
+			k_up();
 			break;
 
 		case KEY_DOWN:
-			k_down ();
+			k_down();
 			break;
 		case KEY_LEFT:
 			if (cur_pos)
@@ -1246,7 +1267,11 @@ int main (int argv, char **argc)
 				beep ();
 			break;
 		}
-		norm_cur ();
+
+                getyx( stdscr, posy, posx );
+		norm_cur();
+                move( posy, posx );
+
 	}
 	/* NOTREACHED */
 
