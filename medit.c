@@ -21,7 +21,7 @@
 #define MYOS 0
 #endif
 
-float editor_version = 0.21;
+float editor_version = 0.22;
 
 #include <ncurses.h>
 #include <signal.h>
